@@ -11,3 +11,6 @@ Obfuscate Powershell scripts
 
 #### Rename variables
 > python3 PS1obfuscate.py myfile.ps1 -V
+
+#### Do all
+> python3 PS1obfuscate.py myfile.ps1
