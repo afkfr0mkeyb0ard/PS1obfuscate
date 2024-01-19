@@ -40,7 +40,7 @@ def main():
 	if '-V' in sys.argv or default :
 		script = renameVariables(script)
 	
-	outputfilename = file + '_OBF'
+	outputfilename = file.split('.')[0] + '-OBFUSCATED.ps1'
 	with open(outputfilename, "w") as outputfile:
 		outputfile.write(script)
 		print("[+] File written to " + outputfilename)
