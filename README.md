@@ -14,3 +14,7 @@ Obfuscate Powershell scripts
 
 ### Do all
 ```> python3 PS1obfuscate.py myfile.ps1```
+
+### Example with Winpeas
+
+![ctf](https://github.com/afkfr0mkeyb0ard/PS1obfuscate/assets/123593001/2b8ba424-0fb2-471c-a835-a8603878a4b0)
