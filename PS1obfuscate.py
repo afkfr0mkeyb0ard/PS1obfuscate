@@ -3,11 +3,12 @@ import string
 import re
 import sys
 
-#> python3 PS1obfuscate.py myfile.ps1 [-C] [-F] [-V]
+#> python3 PS1obfuscate.py myfile.ps1 [-E] [-C] [-F] [-V]
 
 if len(sys.argv) <= 1 :
     print("[!] Please provide a file.")
-    print("[EXAMPLE] > python3 PS1obfuscate.py myfile.ps1 [-C] [-F] [-V]")
+    print("[EXAMPLE] > python3 PS1obfuscate.py myfile.ps1 [-E] [-C] [-F] [-V]")
+    print("-E 	Remove empty lines")
     print("-C 	Remove comments")
     print("-F 	Rename functions")
     print("-V 	Rename variables")
@@ -16,7 +17,8 @@ if len(sys.argv) <= 1 :
     sys.exit()
 
 if '-h' in sys.argv :
-	print("[EXAMPLE] > python3 PS1obfuscate.py myfile.ps1 [-C] [-F] [-V]")
+	print("[EXAMPLE] > python3 PS1obfuscate.py myfile.ps1 [-E] [-C] [-F] [-V]")
+	print("-E 	Remove empty lines")
 	print("-C 	Remove comments")
 	print("-F 	Rename functions")
 	print("-V 	Rename variables")
@@ -31,6 +33,9 @@ def main():
 	script = getFileContent(file)
 	print("[+] Working with file " + file)
 
+	if '-E' in sys.argv or default :
+		script = removeEmptyLines(script)
+
 	if '-C' in sys.argv or default :
 		script = removeComments(script)
 
@@ -39,12 +44,21 @@ def main():
 	
 	if '-V' in sys.argv or default :
 		script = renameVariables(script)
-	
+
 	outputfilename = file.split('.')[0] + '-OBFUSCATED.ps1'
+
 	with open(outputfilename, "w") as outputfile:
 		outputfile.write(script)
 		print("[+] File written to " + outputfilename)
-	
+
+#Returns a string with empty lines removed
+def removeEmptyLines(content):
+	result = ""
+	for line in content.splitlines():
+		if not line == "" and not line == " " and not line == None:
+			result = result + "\n" + line
+	return result
+
 #Returns a string with modified functions
 def renameFunctions(string):
 	print("[+] Renaming functions")
@@ -55,7 +69,7 @@ def renameFunctions(string):
 
 #Returns a list of all script functions names
 def getFunctions(string):
-    pattern = re.compile(r'\b[Ff]unction\s+([a-zA-Z_]\w*-*\w*)\s*{')
+    pattern = re.compile(r'[Ff]unction\s+(?:\w*:)*([a-zA-Z_]\w*-*_*\w*)\s*(?:\(.*\))*\s*{')
     list_functions = pattern.findall(string)
     result = list(set(list_functions)) #remove duplicas
     return result
@@ -65,7 +79,9 @@ def renameVariables(string):
 	print("[+] Renaming variables")
 	variables = getVariables(string)
 	for variable in variables :
-		string = string.replace(variable,'$' + getRandomString(10))
+		randomstring = getRandomString(10)
+		string = string.replace(variable,'$' + randomstring)
+		string = string.replace(' ' + variable.replace('$','-') + ' ',' -' + randomstring + ' ')
 	return string
 
 #Returns a list of all script variables
