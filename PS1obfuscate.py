@@ -53,6 +53,7 @@ def main():
 
 #Returns a string with empty lines removed
 def removeEmptyLines(content):
+	print("[+] Removing empty lines")
 	result = ""
 	for line in content.splitlines():
 		if not line == "" and not line == " " and not line == None:
