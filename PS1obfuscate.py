@@ -33,9 +33,6 @@ def main():
 	script = getFileContent(file)
 	print("[+] Working with file " + file)
 
-	if '-E' in sys.argv or default :
-		script = removeEmptyLines(script)
-
 	if '-C' in sys.argv or default :
 		script = removeComments(script)
 
@@ -44,6 +41,9 @@ def main():
 	
 	if '-V' in sys.argv or default :
 		script = renameVariables(script)
+		
+	if '-E' in sys.argv or default :
+		script = removeEmptyLines(script)
 
 	outputfilename = file.split('.')[0] + '-OBFUSCATED.ps1'
 
@@ -53,7 +53,6 @@ def main():
 
 #Returns a string with empty lines removed
 def removeEmptyLines(content):
-	print("[+] Removing empty lines")
 	result = ""
 	for line in content.splitlines():
 		if not line == "" and not line == " " and not line == None:
@@ -78,17 +77,30 @@ def getFunctions(string):
 #Returns a string with modified variables
 def renameVariables(string):
 	print("[+] Renaming variables")
+	string = lowerVariables(string)
 	variables = getVariables(string)
 	for variable in variables :
 		randomstring = getRandomString(10)
-		string = string.replace(variable,'$' + randomstring)
-		string = string.replace(' ' + variable.replace('$','-') + ' ',' -' + randomstring + ' ')
+		string = string.replace('$' + variable,'$' + randomstring)
 	return string
 
-#Returns a list of all script variables
+#Returns a string with all variables lowered
+def lowerVariables(string):
+	list__all_variables = re.findall(r'\$(\w+)\s*', string)
+	result = []
+	for element in list__all_variables:
+		if element not in result:
+			result.append(element)
+	result.sort(key=len, reverse=True)
+	for element in result:
+		string = string.replace('$' + element, '$' + element.lower())
+	return string
+
+#Returns a list of all script variables that are not functions parameters
 def getVariables(string):
-    list_variables = re.findall(r'\$[a-zA-Z0-9_]+', string)
+    list_variables = re.findall(r'\$(\w+)\s*=', string)
     result = list(set(list_variables)) #remove duplicas
+    result.sort(key=len, reverse=True) #sorted by len to prevent erasing other variables with the same name
     return result
 
 #Returns a string without the script PS comments
